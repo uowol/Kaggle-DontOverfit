@@ -11,8 +11,8 @@ def get_data():
 def insert_data(db_connection, data):
     insert_query = '''
     INSERT INTO train 
-        (id, target, ''' + ', '.join([f'f{i}' for i in range(0, 300)]) + ') ' + \
-        'VALUES (' + ', '.join(['%s' for _ in range(0, 302)]) + ');'
+        (id, target, ''' + ', '.join([f'f{i}' for i in range(300)]) + ') ' + \
+        'VALUES (' + ', '.join(['%s' for _ in range(302)]) + ');'
     print(insert_query)
     with db_connection.cursor() as cur:
         cur.execute(insert_query, data)

@@ -11,10 +11,12 @@ WORKDIR /usr/app
 
 # Excute command
 RUN pip install -U pip && \
-    pip install pscycopg2-binary
+    pip install pscycopg2-binary && \
+    mkdir /usr/app/data 
 
 # Copy file into the image
 COPY data_generater.py data_generater.py
+COPY dataset/train.csv /usr/app/data/train.csv
 
 # Excute command when run container
 ENTRYPOINT [ "python", "data_generater.py", "--db-host" ]
