@@ -11,15 +11,16 @@ WORKDIR /usr/app
 
 # Excute command
 RUN pip install -U pip && \
-    pip install pscycopg2-binary && \
-    mkdir /usr/app/data 
+    pip install psycopg2-binary && \
+    pip install pandas && \
+    mkdir data
 
 # Copy file into the image
-COPY data_generater.py data_generater.py
-COPY dataset/train.csv /usr/app/data/train.csv
+COPY data_generator.py data_generator.py
+COPY dataset/train.csv data/train.csv
 
 # Excute command when run container
-ENTRYPOINT [ "python", "data_generater.py", "--db-host" ]
+ENTRYPOINT [ "python", "data_generator.py", "--db-host" ]
 
 # Deliver arguments to ENTRYPOINT when run container
 CMD [ "localhost" ]

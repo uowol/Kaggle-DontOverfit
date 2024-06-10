@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 
 import pandas as pd 
 import psycopg2
+import time 
 
 ### Overview
 # 아래 스크립트를 모아 작성한 스크립트입니다.
@@ -10,7 +11,7 @@ import psycopg2
 
 
 def get_data():
-    df = pd.read_csv('dataset/train.csv')
+    df = pd.read_csv('data/train.csv')
     rename_rule = {col: f'f{i}' for i, col in enumerate(df.columns[2:])}
     df = df.rename(columns=rename_rule)
     return df
@@ -35,7 +36,8 @@ def insert_data(db_connection, data):
     with db_connection.cursor() as cur:
         for i, row in data.iterrows():
             cur.execute(insert_query, row)
-        db_connection.commit()
+            time.sleep(1)
+            db_connection.commit()
         
 
 if __name__ == '__main__':
