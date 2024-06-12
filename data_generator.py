@@ -46,11 +46,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     db_connect = psycopg2.connect(
-        user='username',
-        password='password',
+        user='kcw',
+        password='pw',
         host=args.db_host,
         port=5432,
-        database='database'
+        database='kaggle'
     )
     create_table(db_connect)
     df = get_data()

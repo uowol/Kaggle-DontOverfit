@@ -1,0 +1,31 @@
+version: "3"  # docker-compose 파일의 버전을 명시합니다.
+
+services:
+  postgres-server:  # 서비스의 이름, docker-compose up [서비스 이름] 등 docker compose에서 관리하는 서비스를 식별할 때 사용합니다.
+    image: postgres:14.0
+    container_name: postgres-server # 컨테이너의 이름, docker ps와 같이 docker 명령을 사용하여 컨테이너를 관리할 때 사용합니다.
+    ports:          # 외부로 노출할 포트 포워딩을 설정합니다.
+      - 5432:5432 
+    environment:    # 컨테이너 환경 변수를 설정합니다.
+      POSTGRES_USER: kcw
+      POSTGRES_PASSWORD: pw
+      POSTGRES_DB: kaggle
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-U", "kcw", "-d", "kaggle"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  data-generator:
+    build:          # Dockerfile을 사용하여 이미지를 빌드합니다.
+      context: .    # Dockerfile이 있는 경로를 지정합니다.
+      dockerfile: Dockerfile
+    container_name: data-generator
+    depends_on:     # 서비스가 다른 서비스에 의존성을 가질 때 사용합니다. postgres-server 서비스가 먼저 실행되어야 합니다.
+      postgres-server:
+        condition: service_healthy
+    command: ["postgres-server"]  # Dockerfile에 작성되어 있는 CMD를 덮어씁니다.
+
+networks:
+  default:
+    name: mlops-network # 네트워크의 이름을 지정합니다.
