@@ -43,14 +43,17 @@ def insert_data(db_connection, data):
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--db-host", dest="db_host", type=str, default='localhost') # args.db_host로 접근할 수 있습니다.
+    parser.add_argument("--user", dest="user", type=str)
+    parser.add_argument("--password", dest="password", type=str)
+    parser.add_argument("--database", dest="database", type=str)
     args = parser.parse_args()
     
     db_connect = psycopg2.connect(
-        user='kcw',
-        password='pw',
+        user=args.user,
+        password=args.password,
         host=args.db_host,
         port=5432,
-        database='kaggle'
+        database=args.database
     )
     create_table(db_connect)
     df = get_data()

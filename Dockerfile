@@ -19,8 +19,8 @@ RUN pip install -U pip && \
 COPY data_generator.py data_generator.py
 COPY dataset/train.csv data/train.csv
 
-# Excute command when run container
-ENTRYPOINT [ "python", "data_generator.py", "--db-host" ]
+# Execute command when run container
+ENTRYPOINT [ "python", "data_generator.py" ]
 
 # Deliver arguments to ENTRYPOINT when run container
-CMD [ "localhost" ]
+CMD [ "--db-host", "localhost", "--user", "id", "--password", "pw", "--database", "db" ]
