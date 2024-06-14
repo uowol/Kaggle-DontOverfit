@@ -17,7 +17,7 @@ RUN pip install -U pip && \
 
 # Copy file into the image
 COPY data_generator.py data_generator.py
-COPY dataset/train.csv data/train.csv
+COPY data/train.csv data/train.csv
 
 # Execute command when run container
 ENTRYPOINT [ "python", "data_generator.py" ]
