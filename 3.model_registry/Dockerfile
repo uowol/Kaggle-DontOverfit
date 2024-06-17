@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install MLflow, PostgreSQL and AWS SDK
 RUN pip install -U pip && \
-    pip install mlflow psycopg2-binary boto3
+    pip install mlflow psycopg2-binary boto3==1.26.8
 
 # Install MinIO client
 RUN cd /tmp && \
