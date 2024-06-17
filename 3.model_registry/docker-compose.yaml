@@ -42,6 +42,10 @@ services:
         condition: service_healthy
     ports:
       - 5000:5000
+    environment:
+      AWS_ACCESS_KEY_ID: kcw
+      AWS_SECRET_ACCESS_KEY: miniostorage
+      MLFLOW_S3_ENDPOINT_URL: http://mlflow-artifact-store:9000
     command:
       - /bin/sh
       - -c
