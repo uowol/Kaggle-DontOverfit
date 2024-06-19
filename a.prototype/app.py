@@ -90,9 +90,7 @@ if st.button("Train") and train_uploaded_file is not None:
         st.success(f"Model saved as '{train_model_name}'. Run ID: {mlflow.active_run().info.run_id}")
 
 
-def predict(row: dict, run_id: str, model_name: str):
-    # Load the model
-    model = mlflow.sklearn.load_model(f"runs:/{run_id}/{model_name}")
+def predict(row: dict, model: Pipeline) -> float:
     input_df = pd.DataFrame([{ f"f{i}": row[str(i)] for i in range(300) }])
     return model.predict(input_df).item()
 
@@ -121,14 +119,18 @@ run_id = st.text_input("Run ID", "")
 
 # If file, model name, and run id are provided
 if st.button("Predict") and test_uploaded_file is not None and test_model_name and run_id:
+    # Load the model
+    model = mlflow.sklearn.load_model(f"runs:/{run_id}/{test_model_name}")
+
     # Read csv file
     df = pd.read_csv(test_uploaded_file)
 
     ids = df['id']
     X = df.drop(columns=['id'])
+    X.columns = [f"f{i}" for i in range(300)]
     with st.spinner(text="In progress..."):
         start_time = time.time()
-        y = X.apply(lambda x: predict(x, run_id, test_model_name), axis=1)
+        y = st.write(model.predict(X))
         end_time = time.time()
         elapsed_time = end_time - start_time
     st.success(f"Done! Saved as 'submission_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv'. \
@@ -142,6 +144,6 @@ if st.button("Predict") and test_uploaded_file is not None and test_model_name a
         mime = "text/csv"
     )
 
-    # DEBUG: Save as csv file on local
-    pd.DataFrame({'id': ids, 'target': y}).to_csv(
-        f"submission_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv", index=False)
+    # # DEBUG: Save as csv file on local
+    # pd.DataFrame({'id': ids, 'target': y}).to_csv(
+    #     f"submission_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv", index=False)
