@@ -12,10 +12,8 @@ os.environ["AWS_ACCESS_KEY_ID"] = "kcw"
 os.environ["AWS_SECRET_ACCESS_KEY"] = "miniostorage"
 
 
-def get_model(run_id: str = None, model_name: str = "sk_model"):
-    if run_id is None:
-        return mlflow.sklearn.load_model(model_uri="./sk_model")        # 다운받은 모델 Artifact를 활용합니다. 
-    return mlflow.sklearn.load_model(f"runs:/{run_id}/{model_name}")    # MLflow Tracking URI에 저장된 모델을 활용합니다.
+def get_model():
+    return mlflow.sklearn.load_model(model_uri="./sk_model")        # 다운받은 모델 Artifact를 활용합니다. 
 
 
 # Load the model
@@ -31,14 +29,14 @@ def predict(data: PredIn) -> PredOut:
     pred = MODEL.predict(input_df).item()
     return PredOut(target=pred)
 
-@app.post("/predict/model/{model_name}/run/{run_id}", response_model=PredOut)
-def predict(data: PredIn, model_name: str, run_id: str) -> PredOut:
-    global MODEL
-    MODEL = get_model(run_id=run_id, model_name=model_name)
+# @app.post("/predict/model/{model_name}/run/{run_id}", response_model=PredOut)
+# def predict(model_name: str, run_id: str, data: PredIn) -> PredOut:
+#     global MODEL
+#     MODEL = get_model(run_id=run_id, model_name=model_name)
 
-    input_df = pd.DataFrame([data.dict()])
-    pred = MODEL.predict(input_df).item()
-    return PredOut(target=pred)
+#     input_df = pd.DataFrame([data.dict()])
+#     pred = MODEL.predict(input_df).item()
+#     return PredOut(target=pred)
 
 
 
