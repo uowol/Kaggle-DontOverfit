@@ -2,13 +2,10 @@
 # 참고: https://docs.streamlit.io/library
 from datetime import datetime 
 import pandas as pd 
-import requests
-import json 
 import time
 import os
 
 import streamlit as st
-import psycopg2
 import mlflow
 
 from sklearn.model_selection import train_test_split
@@ -18,28 +15,12 @@ from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 
 
-def predict(row: dict, run_id: str, model_name: str):
-    # Request data to API server
-    uri = f'http://localhost:8000/predict/model/{model_name}/run/{run_id}'
-    headers = {'Content-Type': 'application/json'}
-    request_body = { f"f{i}": row[str(i)] for i in range(300) }
-    response = requests.post(uri, headers=headers, data=json.dumps(request_body))
-    response_body = response.json()
-    return response_body['target']
-
-@st.cache_data
-def convert_output(ids, y):
-    # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    result = pd.DataFrame({'id': ids, 'target': y})
-    return result.to_csv(index=False).encode("utf-8")
-
-
 # Set mlflow environment variables
-os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://localhost:9000"  # MinIO Artifact Store
-os.environ["MLFLOW_TRACKING_URI"] = "http://localhost:5000"     # MLflow Tracking Server
+HOST = "172.19.75.88"
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = f"http://{HOST}:9000"  # MinIO Artifact Store
+os.environ["MLFLOW_TRACKING_URI"] = f"http://{HOST}:5000"     # MLflow Tracking Server
 os.environ["AWS_ACCESS_KEY_ID"] = "kcw"
 os.environ["AWS_SECRET_ACCESS_KEY"] = "miniostorage"
-
 
 # Title
 st.title("Competition, Don't Overfit!")
@@ -62,6 +43,7 @@ if st.button("Train") and train_uploaded_file is not None:
     df = pd.read_csv(train_uploaded_file)
     
     X = df.drop(columns=['id', 'target'])
+    X.columns = [f"f{i}" for i in range(300)]
     y = df['target']    
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=42)
     
@@ -104,7 +86,21 @@ if st.button("Train") and train_uploaded_file is not None:
             signature=signature,            # input/output signature를 지정합니다.
             input_example=input_sample      # input_example을 지정하면 추후에 추론할 때 사용할 수 있습니다.
         )
+        print("*"*100)
         st.success(f"Model saved as '{train_model_name}'. Run ID: {mlflow.active_run().info.run_id}")
+
+
+def predict(row: dict, run_id: str, model_name: str):
+    # Load the model
+    model = mlflow.sklearn.load_model(f"runs:/{run_id}/{model_name}")
+    input_df = pd.DataFrame([{ f"f{i}": row[str(i)] for i in range(300) }])
+    return model.predict(input_df).item()
+
+@st.cache_data
+def convert_output(ids, y):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    result = pd.DataFrame({'id': ids, 'target': y})
+    return result.to_csv(index=False).encode("utf-8")
 
 
 # Subtitle
