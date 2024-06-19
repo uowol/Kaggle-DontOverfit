@@ -9,4 +9,4 @@ PredIn = create_model("PredIn", **fields)               # PredIn 클래스를 �
 
 ## class PredOut ## 
 class PredOut(BaseModel):
-    target: float
+    target: int
