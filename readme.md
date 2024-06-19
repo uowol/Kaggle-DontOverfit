@@ -18,6 +18,7 @@
 ### 2024-06-19
 - [ ] Streamlit을 활용한 프로토타입 만들기
     - [x] POST /predict, {"f0": float, "f1": float, ..., "f299": float}, {"target": float}
-    - [ ] 'test.csv' 파일을 넘기면 'sample_submission.csv' 파일을 반환한다.
-
+    - [x] 'test.csv' 파일을 넘기면 'sample_submission.csv' 파일을 반환한다.
+    - [ ] 학습 기능을 추가한다.
+    - [ ] 데이터베이스 업데이트 기능을 추가한다.
 
